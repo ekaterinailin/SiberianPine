@@ -54,7 +54,36 @@ class BayesianFlaringAnalysis(object):
 
     Attributes:
     -----------
-    times
+    times : array
+        times of events
+    events : array
+        energies of events
+    mined : float
+        energy at which the cumulative 
+        flare frequency is evaluated
+    threshed : float
+        detection threshold for flares 
+        in the sample (not very well defined
+        because it is energy dependent here)
+    deltaT : float
+        time interval considered for prediction
+        of flaring rate above mined
+    Tprime : float
+        total observation time (light curve length)
+        in days
+    alpha_prior : float
+        prior on alpha (e.g. 2.0)
+    eps_prior : float
+        prior on flaring probability within delta T
+        as in:
+        eps_prior = 1 - np.exp(-rate_prior * deltaT)
+        where rate_prior is the prior in flares per day
+    Mprime : int
+        total number of events
+    M : int
+        number of events in an interval that can
+        be considered a Poisson process with a constant
+        intensity.
     '''
 
     def __init__(self, times=None, events=None, mined=None,
