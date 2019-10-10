@@ -9,3 +9,13 @@ def generate_random_power_law_distribution(a, b, g, size=1, seed=None):
     r = np.random.random(size=size)
     ag, bg = a**g, b**g
     return (ag + (bg - ag)*r)**(1./g)
+    
+def logit(function):
+    '''Make a probability distribution
+    a log probability distribution.'''
+    def wrapper(*args, **kwargs):
+        result = function(*args, **kwargs)
+        np.seterr(divide='ignore') # ignore division by zero because you want to have the -np.inf results
+        result = np.log(result)
+        return result
+    return wrapper

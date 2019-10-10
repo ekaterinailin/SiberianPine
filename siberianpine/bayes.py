@@ -49,6 +49,8 @@ import numpy as np
 import emcee
 import corner
 
+from .utils import logit
+
 class BayesianFlaringAnalysis(object):
     '''Analysis suite for flaring statistics.
 
@@ -84,6 +86,8 @@ class BayesianFlaringAnalysis(object):
         number of events in an interval that can
         be considered a Poisson process with a constant
         intensity.
+    samples : ndarray
+        MCMC sampling result
     '''
 
     def __init__(self, times=None, events=None, mined=None,
@@ -116,7 +120,7 @@ class BayesianFlaringAnalysis(object):
         # log likelihood
         self.loglikelihood = loglikelihood
 
-        # output data if you only want to the post-processing or plotting
+        # output data for post-processing or plotting
         self.samples = samples
 
     def sample_posterior_with_mcmc(self, nwalkers=300, cutoff=100, steps=500):
@@ -226,15 +230,7 @@ def calculate_posterior_value_that_can_be_passed_to_mcmc(lp):
     else:
         return lp
 
-def logit(function):
-    '''Make a probability distribution
-    a log probability distribution.'''
-    def wrapper(*args, **kwargs):
-        result = function(*args, **kwargs)
-        np.seterr(divide='ignore') # ignore division by zero because you want to have the -np.inf results
-        result = np.log(result)
-        return result
-    return wrapper
+
 
 
 def calculate_joint_posterior_distribution(theta, mined, Tprime,
