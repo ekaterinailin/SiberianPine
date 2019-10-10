@@ -231,14 +231,13 @@ def calculate_posterior_value_that_can_be_passed_to_mcmc(lp):
         return lp
 
 
-
-
 def calculate_joint_posterior_distribution(theta, mined, Tprime,
                                            Mprime, deltaT, threshed,
                                            M, events, prior):
     '''Equation (24) in Wheatland 2004.
     Log-probability distribution of an event bigger than mined
-    occurring in an interval deltaT. NOT TESTED.
+    occurring in an interval deltaT. 
+    NOT TESTED.
 
     Parameters:
     ----------
@@ -301,6 +300,7 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
 def uninformative_prior(rate, minrate, maxrate):
     '''Uninformative prior for the rates.
     Uniform within [minrate, maxrate].
+    TESTED
 
     Parameters:
     -------------
@@ -328,6 +328,7 @@ def occurrence_probability_posterior(x, alpha, mined, Tprime,
     '''Equation (25) in Wheatland 2004.
     Probability distribution of an event bigger than mined
     occurring in an interval deltaT.
+    TESTED
 
     Parameters:
     ----------
@@ -363,6 +364,7 @@ def occurrence_probability_posterior(x, alpha, mined, Tprime,
 def flaring_rate_likelihood(rates, Mprime, Tprime, norm=False):
     '''Equation (18) from Wheatland.
     Likelihood distribution for rates.
+    TESTED
 
     Parameters:
     -----------
