@@ -52,7 +52,7 @@ class MixedModel(object):
 
         args, inits = [], []
         
-        for bfa in BFA:
+        for bfa in self.BFA:
             args.append([bfa.mined, bfa.Tprime, bfa.Mprime,
                          bfa.deltaT, bfa.threshed, bfa.M,
                          bfa.events])
@@ -75,12 +75,12 @@ class MixedModel(object):
         '''Show (and save) a corner plot. NOT TESTED.
 
         '''
-        truths = [bfa.eps_prior for bfa in BFA]
+        truths = [bfa.eps_prior for bfa in self.BFA]
         truths.append(2.)
 
-        ndim = len(BFA)
+        ndim = len(self.BFA)
         labels = [r'$\epsilon_{}$'.format(i) for i in range(ndim)] + [r'$\alpha$']
-        fig = corner.corner(MM.samples, 
+        fig = corner.corner(self.samples, 
                             labels=labels,
                             quantiles=[0.16, 0.5, 0.84],
                             show_titles=True,
