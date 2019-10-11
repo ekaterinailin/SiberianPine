@@ -74,7 +74,7 @@ def generate_synthetic_bfa_input(flares_per_day=10.,
 
     # Generate power law distributed data:
     events = generate_random_power_law_distribution(1, maxed, -alpha_prior + 1., size=Mprime, seed=seed)
-    threshed = 1 # detection sensitivity limit
+    threshed = threshed # detection sensitivity limit
 
     # determine a starting point for the MCMC sampling
     rate_prior = (flares_per_day / np.abs(alpha_prior - 1.) *

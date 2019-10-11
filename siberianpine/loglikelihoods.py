@@ -85,6 +85,7 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
         PI = np.sum(np.log(events / threshed))# eqn (13)
         f4 = alpha * (_f4 - PI)
 
+
         _f5 = Tprime / deltaT * np.power(mined / threshed, alpha - 1.) - 1.
         f5 =  _f5 * np.log(1. - x)
 
