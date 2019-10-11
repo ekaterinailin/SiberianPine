@@ -2,6 +2,25 @@ import numpy as np
 
 from .utils import logit
 
+def mixedmodel_loglikelihood(theta, *args, prior=None):
+    '''Custom likelihood to pass to 
+    MixedModel with a prior of your choice.
+    
+    theta : list of length n
+        theta[:-2] eps_prior values
+        theta[-1] shared alpha_prior
+    args : list of lists 
+        with the parameters for
+        :func:`calculate_joint_posterior_distribution`
+    prior : func
+        prior function of your choice
+    '''
+    posterior = 0
+    for i, beta in enumerate(theta[:-1]):
+        # add the loglikelihoods
+        posterior += calculate_joint_posterior_distribution([beta, theta[-1]], *args[i], prior)
+    return posterior
+
 def calculate_posterior_value_that_can_be_passed_to_mcmc(lp):
     '''Do some checks to make sure MCMC will work. NOT TESTED.'''
     if not np.isfinite(lp):
