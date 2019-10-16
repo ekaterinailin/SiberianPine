@@ -66,6 +66,7 @@ def generate_synthetic_bfa_input(flares_per_day=10.,
     size = int(np.rint(Tprime*24*cadence))
     obstimes = np.linspace(t0,t0+Tprime,size) # 15 min cadence observations
 
+    np.random.seed(seed=seed)
     times = obstimes[np.where(np.random.poisson(lam=1. / 24. / cadence * flares_per_day,
                                                 size=size))[0]]
     Mprime = len(times) # number of events

@@ -3,11 +3,99 @@ import pytest
 from ..loglikelihoods import (flaring_rate_likelihood,
                               occurrence_probability_posterior,
                               calculate_joint_posterior_distribution,)
-from ..utils import generate_random_power_law_distribution
+from ..utils import generate_random_power_law_distribution, generate_synthetic_bfa_input
+from ..priors import uninformative_prior
 
 
 def test_calculate_joint_posterior_distribution():
-    pass
+    
+    # Test some real values
+    #------------------------------------------------------------------------------
+
+    def prior(x):
+        return uninformative_prior(x,1.8,2.2)
+
+    bfa = generate_synthetic_bfa_input(seed=20)
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+
+
+    res = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                               bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                               bfa["Tprime"], bfa["events"], prior)
+
+
+    assert isinstance(res, float)
+    assert res == pytest.approx(1828.9078245805415)
+
+    # Test some real values
+    #------------------------------------------------------------------------------
+    bfa = generate_synthetic_bfa_input(flares_per_day=0.001, seed=1003)
+
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+
+    resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                               bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                               bfa["Tprime"], bfa["events"], prior)
+    assert resw == pytest.approx(-0.04999)
+
+    # 
+    #------------------------------------------------------------------------------
+    bfa = generate_synthetic_bfa_input(flares_per_day=0.0, seed=1003)
+
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+
+    resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                               bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                               bfa["Tprime"], bfa["events"], prior)
+    assert resw == -np.inf
+
+    # Test wrong input events with error string
+    #------------------------------------------------------------------------------
+    err_string = ("Flare event data must be a 1D numpy array or list.")
+    with pytest.raises(ValueError) as err:
+        resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                           bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                           bfa["Tprime"], 60., prior)
+        assert err_string == err.value.args[0]
+        
+    #------------------------------------------------------------------------------
+    def prior(x):
+        return uninformative_prior(x,1.98,2.02)
+
+    bfa = generate_synthetic_bfa_input(flares_per_day=1., seed=22)
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+    resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                           bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                           bfa["Tprime"], bfa["events"], prior)
+    assert resw==pytest.approx(112.66378606364091)
+
+    # Test how a more informative prior increases the likelihood value
+    #------------------------------------------------------------------------------
+    def prior(x):
+        return uninformative_prior(x,1.999,2.0001)
+
+    bfa = generate_synthetic_bfa_input(flares_per_day=1., seed=22)
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+    resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                           bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                           bfa["Tprime"], bfa["events"], prior)
+    assert resw==pytest.approx(116.25735533795043)
+
+
+    # Test how a more informative prior increases the likelihood value
+    #------------------------------------------------------------------------------
+    def prior(x):
+        return uninformative_prior(x,1.99999,2.000001)
+
+    bfa = generate_synthetic_bfa_input(flares_per_day=1., seed=22)
+    theta = (bfa["eps_prior"], bfa["alpha_prior"])
+    resw = calculate_joint_posterior_distribution(theta, bfa["mined"], bfa["Tprime"],
+                                           bfa["Mprime"], bfa["deltaT"], bfa["threshed"],
+                                           bfa["Tprime"], bfa["events"], prior)
+
+    assert resw==pytest.approx(120.86252552391994)
+
+
 
 def test_flaring_rate_likelihood():
     '''Test flaring rate likelihood with a

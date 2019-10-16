@@ -37,6 +37,9 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
     '''Equation (24) in Wheatland 2004.
     Log-probability distribution of an event bigger than mined
     occurring in an interval deltaT. 
+    
+    If there are no events observed during a campaign, we only update the
+    flaring probability and fix alpha to the initial value.
     NOT TESTED.
 
     Parameters:
@@ -90,9 +93,19 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
         f5 =  _f5 * np.log(1. - x)
 
         # logify factors and add:
-
-        lp = f1 + f2 + f3 + f4 + f5
-
+        if not (isinstance(events, np.ndarray) | isinstance(events, list)):
+        
+            raise ValueError("Flare event data must be a 1D numpy array or list.")
+       
+        elif len(events) > 0:
+     
+            lp = f1 + f2 + f3 + f4 + f5
+            
+        elif len(events) == 0:
+            
+            lp = f1 + f5 # if no events are observed default to Eq. (24)
+        
+         
         # Check for bad values before returning the result:
 
         return calculate_posterior_value_that_can_be_passed_to_mcmc(lp)
