@@ -9,7 +9,6 @@ class MixedModel(object):
     """
     def __init__(self, BFA=[], loglikelihood=None, alpha_prior=None):
         '''Constructor for a Mixed Model Bayesian analysis suite. 
-        NOT TESTED.
         
         Attributes:
         -----------
@@ -23,6 +22,9 @@ class MixedModel(object):
         self.BFA = BFA
         self.loglikelihood = loglikelihood
         self.alpha_prior = alpha_prior
+    
+    def __repr__(self):
+        return(f"MixedModel: {len(self.BFA)} data sets.") 
         
     def sample_posterior_with_mcmc(self, nwalkers=300, cutoff=100, steps=500):
         '''Sample from the posterior using MCMC.
@@ -88,4 +90,24 @@ class MixedModel(object):
                             truths=truths,)
         if save==True:
             fig.savefig(path, dpi=300)
+          
+    def calculate_percentiles(self, percentiles=[16, 50, 84]):
+        '''Calculate best fit value and its uncertainties.
+
+        Parameters:
+        -----------
+        percentiles : n-list
+            percentiles to compute
+            
+        Return:
+        --------
+        a tuple of n-tuples with
+        (median, upper_uncert, lower_uncert)
+        each.
+        '''
+        map_of_results = map(lambda v: (v[1],  v[2] - v[1], v[1] - v[0]),
+                               zip(*np.percentile(self.samples, percentiles, axis=0)))
+        p = list(map_of_results)
+        self.percentiles = p
+        return p
             
