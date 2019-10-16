@@ -3,9 +3,55 @@ import pytest
 from ..loglikelihoods import (flaring_rate_likelihood,
                               occurrence_probability_posterior,
                               calculate_joint_posterior_distribution,
-                              calculate_posterior_value_that_can_be_passed_to_mcmc)
+                              calculate_posterior_value_that_can_be_passed_to_mcmc,
+                              mixedmodel_loglikelihood)
 from ..utils import generate_random_power_law_distribution, generate_synthetic_bfa_input
 from ..priors import uninformative_prior
+
+
+def test_mixedmodel_loglikelihood():
+    # ------------------------------------------------
+    # Create some data 
+    theta = (.1,.1, 2.)
+    # args = [mined, Tprime, Mprime, deltaT, threshed, M, events]
+    argsc = [20, 2, 3, 20, 1, 3,[10,20,30]] 
+    args = [argsc, argsc]
+
+    # Test one functional case
+    def prior(x):
+        return uninformative_prior(x,1.8,2.2)
+        
+    assert mixedmodel_loglikelihood(theta, *args, prior=prior) == pytest.approx(1.2533138525810665)
+
+    # Test a case with a higher likelihood 
+    def prior(x):
+        return uninformative_prior(x,1.98,2.02)
+
+        assert mixedmodel_loglikelihood(theta, *args, prior=prior) == pytest.approx(5.858484038569156)
+
+    # Remove the events from one data set
+    args[1][-1] = []
+    args[1][2] = 0
+    args[1][-2] = 0
+
+    assert mixedmodel_loglikelihood(theta, *args, prior=prior) == pytest.approx(-0.21072103131565256
+    )
+
+    # Remove the events from the other
+    args[0][-1] = []
+    args[0][2] = 0
+    args[0][-2] = 0
+    assert mixedmodel_loglikelihood(theta, *args, prior=prior) == pytest.approx(-0.21072103131565256)
+
+    # Choose eps out of range (0,1)
+    args = [argsc, argsc]
+    theta = (-0.02,.1, 2.)
+    assert mixedmodel_loglikelihood(theta, *args, prior=prior) == -np.inf
+
+    # Wrong data formats in one sample are enough to let the entire process fail as it should
+    args[0][-1] = 5.
+    with pytest.raises(ValueError) as err:
+        mixedmodel_loglikelihood(theta, *args, prior=prior)
 
 
 def test_calculate_posterior_value_that_can_be_passed_to_mcmc():

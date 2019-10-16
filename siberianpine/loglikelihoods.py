@@ -5,6 +5,7 @@ from .utils import logit
 def mixedmodel_loglikelihood(theta, *args, prior=None):
     '''Custom likelihood to pass to 
     MixedModel with a prior of your choice.
+    NOT TESTED
     
     theta : list of length n
         theta[:-2] eps_prior values
@@ -22,7 +23,7 @@ def mixedmodel_loglikelihood(theta, *args, prior=None):
     return posterior
 
 def calculate_posterior_value_that_can_be_passed_to_mcmc(lp):
-    '''Do some checks to make sure MCMC will work. NOT TESTED.'''
+    '''Do some checks to make sure MCMC will work.'''
     if not np.isfinite(lp):
         return -np.inf
     if np.isnan(lp):
@@ -39,7 +40,7 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
     occurring in an interval deltaT. 
     
     If there are no events observed during a campaign, we only update the
-    flaring probability and fix alpha to the initial value.
+    flaring probability and fix alpha to the initial value with Eq. (23).
 
     Parameters:
     ----------
@@ -74,7 +75,12 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
     if ((x < 0) | (x > 1)):
         return -np.inf
     else:
-
+        # logify factors and add:
+        if not (isinstance(events, np.ndarray) | isinstance(events, list)):
+        
+            raise ValueError("Flare event data must be a 1D numpy array or list.")
+        
+        events = np.array(events)
         # f1-f5 are factors in (24):
         f1 = Mprime * np.log(-np.log(1. - x))
 
@@ -91,12 +97,9 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
         _f5 = Tprime / deltaT * np.power(mined / threshed, alpha - 1.) - 1.
         f5 =  _f5 * np.log(1. - x)
 
-        # logify factors and add:
-        if not (isinstance(events, np.ndarray) | isinstance(events, list)):
-        
-            raise ValueError("Flare event data must be a 1D numpy array or list.")
+
        
-        elif len(events) > 0:
+        if len(events) > 0:
      
             lp = f1 + f2 + f3 + f4 + f5
             
@@ -115,7 +118,6 @@ def occurrence_probability_posterior(x, alpha, mined, Tprime,
     '''Equation (25) in Wheatland 2004.
     Probability distribution of an event bigger than mined
     occurring in an interval deltaT.
-    TESTED
 
     Parameters:
     ----------
@@ -152,7 +154,6 @@ def occurrence_probability_posterior(x, alpha, mined, Tprime,
 def flaring_rate_likelihood(rates, Mprime, Tprime, norm=False):
     '''Equation (18) from Wheatland.
     Likelihood distribution for rates.
-    TESTED
 
     Parameters:
     -----------
