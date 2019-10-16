@@ -40,7 +40,6 @@ def calculate_joint_posterior_distribution(theta, mined, Tprime,
     
     If there are no events observed during a campaign, we only update the
     flaring probability and fix alpha to the initial value.
-    NOT TESTED.
 
     Parameters:
     ----------

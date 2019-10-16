@@ -2,11 +2,20 @@ import numpy as np
 import pytest
 from ..loglikelihoods import (flaring_rate_likelihood,
                               occurrence_probability_posterior,
-                              calculate_joint_posterior_distribution,)
+                              calculate_joint_posterior_distribution,
+                              calculate_posterior_value_that_can_be_passed_to_mcmc)
 from ..utils import generate_random_power_law_distribution, generate_synthetic_bfa_input
 from ..priors import uninformative_prior
 
 
+def test_calculate_posterior_value_that_can_be_passed_to_mcmc():
+    #Just test the diffent cases:
+    assert calculate_posterior_value_that_can_be_passed_to_mcmc(4) == 4.
+    assert calculate_posterior_value_that_can_be_passed_to_mcmc(0.) == 0.
+    assert calculate_posterior_value_that_can_be_passed_to_mcmc(np.inf) == -np.inf
+    assert calculate_posterior_value_that_can_be_passed_to_mcmc(-np.inf) == -np.inf
+    assert calculate_posterior_value_that_can_be_passed_to_mcmc(np.nan) == -np.inf
+    
 def test_calculate_joint_posterior_distribution():
     
     # Test some real values
